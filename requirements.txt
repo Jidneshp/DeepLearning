@@ -1,0 +1,15 @@
+bentoml
+torch
+torchvision
+joblib
+tqdm
+pip_chill
+wincertstore
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scipy
+
+#-e 
