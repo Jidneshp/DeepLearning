@@ -1,8 +1,8 @@
 import os
 import sys
 
-from ..exception import CustomException
-from ..logger import logging
+from src.exception import CustomException
+from src.logger import logging
 
 class S3Operation:
 
