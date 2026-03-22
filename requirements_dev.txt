@@ -20,4 +20,4 @@ flake8
 mypy
 black
 
-#-e .
+-e .
