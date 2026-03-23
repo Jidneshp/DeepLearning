@@ -1,6 +1,5 @@
 import sys
 
-from components import data_ingestion
 from src.logger import logging
 from src.exception import CustomException
 
@@ -39,3 +38,11 @@ class TrainPipeline:
         except Exception as e:
             raise CustomException(e, sys)
 
+    def run_pipeline(self)->None:
+        logging.info('Entered the run_pipeline method of TrainPipeline class')
+
+        try:
+            data_ingestion_artifact:DataIngestionArtifact = self.start_data_ingestion()
+
+        except Exception as e:
+            raise CustomException(e, sys)

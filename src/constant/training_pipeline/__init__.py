@@ -9,6 +9,6 @@ TIMESTAMP: datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 ARTIFACT_DIR:str = 'artifacts'
 
-BUCKET_NAME:str = 'lungxray24'
+BUCKET_NAME:str = 'chest-x-ray-images-1'
 
 S3_DATA_FOLDER:str = 'data'
