@@ -14,3 +14,7 @@ class DataTransformationArtifact:
 
     train_transforms_file_path: str
     test_transforms_file_path:str
+
+@dataclass
+class ModelTrainingArtifact:
+    trained_model_path:str
