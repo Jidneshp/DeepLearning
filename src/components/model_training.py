@@ -3,7 +3,7 @@ import sys
 
 import joblib
 import bentoml
-from torch._dynamo.logging import pbar
+
 from tqdm import tqdm
 
 import torch
@@ -45,12 +45,12 @@ class ModelTrainer:
             try:
                     self.model.train()
 
-                    pbar = tqdm(self.data_transformation_artifact.transformed_train_object)
+                    tbar = tqdm(self.data_transformation_artifact.transformed_train_object)
 
                     correct:int = 0
                     processed=0
 
-                    for batch_idx, (data, target) in enumerate(pbar):
+                    for batch_idx, (data, target) in enumerate(tbar):
 
                         # Initialization of gradient
                         optimizer.zero_grad()
@@ -74,7 +74,7 @@ class ModelTrainer:
 
                         processed += len(data)
 
-                        pbar.set_description(
+                        tbar.set_description(
                             desc=f'Loss={loss.item()}, Batch_id={batch_idx}, Accuracy={100*correct/processed:0.2f}'
                         )
 
@@ -154,6 +154,54 @@ class ModelTrainer:
 
             except Exception as e:
                 raise CustomException(e, sys)
+
+    
+    def initiate_model_training(self)->ModelTrainingArtifact:
+
+        try:
+            logging.info('Entered the initiate_model_trainer method of Model trainer class')
+
+            model:Module = self.model.to(self.model_training_config.device)
+
+            optimizer: Optimizer = torch.optim.SGD(
+                model.parameters(), **self.model_training_config.scheduler_params
+            )
+
+            for epoch in range(1, self.model_training_config.epochs + 1):
+                print(f'Epoch: {epoch}')
+
+                self.train(optimizer=optimizer)
+
+                optimizer.step()
+
+                self.test()
+
+            os.makedirs(self.model_training_config.artifact_dir, exist_ok=True)
+
+            torch.save(model, self.model_training_config.trained_model_path)
+
+            transformed_train_obj = joblib.load(
+                self.data_transformation_artifact.train_transforms_file_path
+            )
+
+            bentoml.pytorch.save_model(
+                name=self.model_training_config.trained_bentoml_model_name,
+                model=model,
+                custom_objects={
+                    self.model_training_config.train_transforms_key : transformed_train_obj
+                }
+            )
+
+            model_training_artifact:ModelTrainingArtifact = ModelTrainingArtifact(
+                trained_model_path=self.model_training_config.trained_model_path
+            )
+
+            logging.info('Exited the initiate_model_trainer method of Model trainer class')
+
+            return model_training_artifact
+
+        except Exception as e:
+            raise CustomException(e, sys)
                         
 
 

@@ -72,7 +72,7 @@ class DataTransformation:
             )-> Tuple[DataLoader, DataLoader]:
 
             try: 
-                logging.inf0('Entered the data_loader method of Data transformation class')
+                logging.info('Entered the data_loader method of Data transformation class')
 
                 train_data:Dataset = ImageFolder(
                     os.path.join(self.data_ingestion_artifact.train_file_path),
