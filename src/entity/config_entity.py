@@ -82,4 +82,20 @@ class ModelTrainingConfig:
 
         self.device:device = DEVICE
 
+
+@dataclass
+class ModelEvalConfig:
+    def __init__(self):
+        self.device:device = DEVICE
+        
+        self.test_loss:int = 0
+
+        self.test_accuracy:int = 0
+
+        self.total:int = 0
+
+        self.total_batch:int = 0
+
+        self.optimizer_params:dict = {'lr':0.01, 'momentum':0.8}
+
         

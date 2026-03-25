@@ -8,12 +8,13 @@ from src.exception import CustomException
 from src.components.data_ingestion import DataIngestion
 from src.components.data_transformation import DataTransformation
 from src.components.model_training import ModelTrainer
+from src.components.model_evaluation import ModelEvaluation
 
 from src.entity.artifact_entity import (DataIngestionArtifact, DataTransformationArtifact, 
-                                        ModelTrainingArtifact)
+                                        ModelTrainingArtifact, ModelEvalArtifact)
 
 from src.entity.config_entity import (DataIngestionConfig, DataTransformationConfig,
-                                      ModelTrainingConfig)
+                                      ModelTrainingConfig, ModelEvalConfig)
 
 
 class TrainPipeline:
@@ -21,6 +22,7 @@ class TrainPipeline:
         self.data_ingestion_config = DataIngestionConfig()
         self.data_transformation_config = DataTransformationConfig()
         self.model_training_config = ModelTrainingConfig()
+        self.model_eval_config = ModelEvalConfig()
 
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
@@ -89,6 +91,30 @@ class TrainPipeline:
         except Exception as e:
             raise CustomException(e, sys)
 
+    
+    def start_model_evaluation(
+        self, model_training_artifact:ModelTrainingArtifact,
+        data_transformation_artifact:DataTransformationArtifact
+        ) -> ModelEvalArtifact:
+
+        logging.info('Entered the start_model_evaluation method of TrainPipeline class')
+
+        try:
+            model_evaluation = ModelEvaluation(
+                data_transformation_artifact=data_transformation_artifact,
+                model_evaluation_config = self.model_eval_config,
+                model_training_artifact=model_training_artifact 
+            )
+
+            model_eval_artifact = model_evaluation.initiate_model_evaluation()
+
+            logging.info('Exited the start_model_evaluation method of TrainPipeline class')
+
+            return model_eval_artifact
+
+        except Exception as e:
+            raise CustomException(e, sys)
+
 
 
 
@@ -102,6 +128,11 @@ class TrainPipeline:
                 self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact))
 
             model_training_artifact:ModelTrainingArtifact = self.start_model_training(
+                data_transformation_artifact=data_transformation_artifact
+            )
+
+            model_eval_artifact:ModelEvalArtifact = self.start_model_evaluation(
+                model_training_artifact=model_training_artifact,
                 data_transformation_artifact=data_transformation_artifact
             )
 
